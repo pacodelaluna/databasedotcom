@@ -196,6 +196,11 @@ module Databasedotcom
       end
       new_record
     end
+    
+    def get_attachment_content(record_id)
+      result = http_get("/services/data/v#{self.version}/sobjects/attachment/#{record_id}/body")
+      result.body
+    end
 
     # Returns a Collection of Sobjects of the class specified in the _soql_expr_, which is a valid SOQL[http://www.salesforce.com/us/developer/docs/api/Content/sforce_api_calls_soql.htm] expression. The objects will only be populated with the values of attributes specified in the query.
     #
