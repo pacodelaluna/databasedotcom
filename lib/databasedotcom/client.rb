@@ -197,6 +197,10 @@ module Databasedotcom
       new_record
     end
     
+    # Returns the content of an Attachment Sobject specified by _record_id_.
+    # The content is return as binary data.
+    #
+    #    client.get_attachment_content("attachmentid") #=> #<...>
     def get_attachment_content(record_id)
       result = http_get("/services/data/v#{self.version}/sobjects/attachment/#{record_id}/body")
       result.body
@@ -285,6 +289,26 @@ module Databasedotcom
       result = JSON.parse(result.body)
       result["topics"].collect { |topic| topic["name"] }
     end
+    
+    def get_password_status(user_id)
+      result = http_get("/services/data/v#{self.version}/sobjects/user/#{user_id}/password")
+      result.body
+    end
+    
+    def reset_password(user_id)
+      result = http_delete("/services/data/v#{self.version}/sobjects/user/#{user_id}/password")
+      result.body
+    end
+    
+    def set_password(user_id, object_attrs)
+      json_params = coerced_json(object_attrs, 'User')
+      result = http_post("/services/data/v#{self.version}/sobjects/user/#{user_id}/password", json_params)
+      if result.success?
+        return result.body
+      else
+        return false
+      end
+    end
 
     # Performs an HTTP GET request to the specified path (relative to self.instance_url).  Query parameters are included from _parameters_.  The required
     # +Authorization+ header is automatically included, as are any additional headers specified in _headers_.  Returns the HTTPResult if it is of type
@@ -294,7 +318,6 @@ module Databasedotcom
         https_request.get(encoded_path, {"Authorization" => "OAuth #{self.oauth_token}"}.merge(headers))
       end
     end
-
 
     # Performs an HTTP DELETE request to the specified path (relative to self.instance_url).  Query parameters are included from _parameters_.  The required
     # +Authorization+ header is automatically included, as are any additional headers specified in _headers_.  Returns the HTTPResult if it is of type
