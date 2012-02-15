@@ -290,24 +290,12 @@ module Databasedotcom
       result["topics"].collect { |topic| topic["name"] }
     end
     
-    def get_password_status(user_id)
-      result = http_get("/services/data/v#{self.version}/sobjects/user/#{user_id}/password")
+    # Set a new password for the User authenticated and referred with the user_id param.
+    #
+    #    client.set_password(12345, "my-new-password")
+    def set_password(user_id, new_password)
+      result = http_post("/services/data/v#{self.version}/sobjects/user/#{user_id}/password", "{\"NewPassword\" : \"#{new_password}\"}")
       result.body
-    end
-    
-    def reset_password(user_id)
-      result = http_delete("/services/data/v#{self.version}/sobjects/user/#{user_id}/password")
-      result.body
-    end
-    
-    def set_password(user_id, object_attrs)
-      json_params = coerced_json(object_attrs, 'User')
-      result = http_post("/services/data/v#{self.version}/sobjects/user/#{user_id}/password", json_params)
-      if result.success?
-        return result.body
-      else
-        return false
-      end
     end
 
     # Performs an HTTP GET request to the specified path (relative to self.instance_url).  Query parameters are included from _parameters_.  The required
