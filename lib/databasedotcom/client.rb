@@ -290,11 +290,22 @@ module Databasedotcom
       result["topics"].collect { |topic| topic["name"] }
     end
     
+    # TODO : Check it out, not working
+    #
+    #
+    def get_password_status(user_id)
+      result = http_get("/services/data/v#{self.version}/sobjects/user/#{user_id}/password")
+      result.body
+    end
+    
     # Reset the password for the User referred with the user_id param.
     #
     #    client.reset_password(12345)
-    def reset_password(user_id)
-      result = http_delete("/services/data/v#{self.version}/sobjects/user/#{user_id}/password")
+    def reset_password(user_id, parameters={}, headers={})
+      #result = http_delete("/services/data/v#{self.version}/sobjects/user/#{user_id}/password")
+      result = with_encoded_path_and_checked_response("/services/data/v#{self.version}/sobjects/user/#{user_id}/password", {:expected_result_class => Net::HTTPOK}) do |encoded_path|
+        https_request.delete(encoded_path, {"Authorization" => "OAuth #{self.oauth_token}"}.merge(headers))
+      end
       result.body
     end
     
