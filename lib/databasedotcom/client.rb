@@ -290,11 +290,20 @@ module Databasedotcom
       result["topics"].collect { |topic| topic["name"] }
     end
     
+    # Reset the password for the User referred with the user_id param.
+    #
+    #    client.reset_password(12345)
+    def reset_password(user_id)
+      result = http_delete("/services/data/v#{self.version}/sobjects/user/#{user_id}/password")
+      result.body
+    end
+    
     # Set a new password for the User authenticated and referred with the user_id param.
     #
     #    client.set_password(12345, "my-new-password")
     def set_password(user_id, new_password)
-      result = http_post("/services/data/v#{self.version}/sobjects/user/#{user_id}/password", "{\"NewPassword\" : \"#{new_password}\"}")
+      json_params = { "NewPassword" => new_password }.to_json
+      result = http_post("/services/data/v#{self.version}/sobjects/user/#{user_id}/password", json_params)
       result.body
     end
 
